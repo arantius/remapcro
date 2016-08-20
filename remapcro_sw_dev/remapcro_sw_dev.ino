@@ -1,3 +1,5 @@
+#include "KeyboardPlus.h"
+
 // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\
 
 // https://forum.arduino.cc/index.php?topic=38107.msg282342#msg282342
@@ -29,30 +31,28 @@ void setup() {
   // In from host processor.
   Serial1.begin(74880);  
 
-  while (!Serial) { }
+  KeyboardPlus.begin();
 
+  while (!Serial) { }
   Serial.println("Device started!");
 }
 
 
-byte buf[16];
+byte buf_curr[16];
+KeyReport report;
 
 void loop() {
   if (Serial1.available()) {
-    /*
-    Serial1.readBytes(buf, 2);
-    if (buf[0] != 0xD0 || buf[1] != 0x0D) {
-      while (Serial1.available()) Serial1.read();
-    }
-    */
-
     byte len = Serial1.read();
-    Serial.print("Reading bytes:");
-    Serial.println(len, DEC);
-
     if (len) {
-      Serial1.readBytes(buf, len);
-      PrintHex8(buf, len);
+      Serial1.readBytes(buf_curr, len);
+
+      // Send the keypress through!
+      memcpy(&report, buf_curr, 8);
+      KeyboardPlus.sendReport(&report);
+
+      // Debug output.
+      PrintHex8(buf_curr, len);
     }
   }
 }
