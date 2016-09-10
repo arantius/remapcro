@@ -21,8 +21,9 @@ IOW from bottom left counting up then right.
 */
 
 void keyMatrixRead() {
-  uint16_t keysNow = 0x0000;
+  static uint8_t isErr = 0;
 
+  uint16_t keysNow = 0x0000;
   uint8_t col;
   uint8_t i = 0;
   uint8_t cols[4] = {};
@@ -54,9 +55,10 @@ void keyMatrixRead() {
           // Otherwise we've got a conflict between multiple keys sharing
           // a row and column, something's a ghost, but we can't tell which.
           // Ignore this case.
-
-          // TODO: Set/track error status, clear when resolved.
-
+          if (!isErr) {
+            isErr = 1;
+            sendErrReport();
+          }
           return;
         }
       }
@@ -64,6 +66,7 @@ void keyMatrixRead() {
   }
 
   if (keysNow == keysPrev) return;
+  isErr = 0;
   
   uint16_t tmpNow = keysNow;
   uint16_t tmpPrev = keysPrev;

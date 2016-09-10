@@ -61,7 +61,10 @@ void HIDSelector::ParseHIDData(
   for (uint8_t i = 0; i < 6; i++) {
     uint8_t key = reportIn->keys[i];
     if (key == 0) break;
-    if (key == 1) return;  // Error reports "1".
+    if (key == 1) {
+      sendErrReport();
+      return;  // Error reports "1".
+    }
     if (!reportContains(reportInPrev, key)) {
       handleUsbKey(1, key);
     }
