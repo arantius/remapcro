@@ -76,11 +76,25 @@ void initUsbDev() {
 
 
 void sendErrReport() {
+#ifdef DEV
+  Serial.println("Sending error report");
+#endif
   KeyboardPlus.sendReport(reportErr);
 }
 
 
 void sendReport() {
+#ifdef DEV
+  Serial.print("Sending report: ");
+  char tmp[8];
+  sprintf(tmp, "%02x 00 ", reportOut->modifiers);
+  Serial.print(tmp);
+  for (uint8_t i = 0; i < 6; i++) {
+    sprintf(tmp, "%02x ", reportOut->keys[i]);
+    Serial.print(tmp);
+  }
+  Serial.println();
+#endif
   KeyboardPlus.sendReport(reportOut);
 }
 
