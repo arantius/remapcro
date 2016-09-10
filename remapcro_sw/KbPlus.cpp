@@ -19,7 +19,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "KeyboardPlus.h"
+#include "KbPlus.h"
 
 #if defined(_USING_HID)
 

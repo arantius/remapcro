@@ -1,7 +1,7 @@
 #include <hidboot.h>
 #include <hidcomposite.h>
 
-#include "KeyboardPlus.h"
+#include "KbPlus.h"
 #include "Matrix.h"
 #include "UsbDev.h"
 #include "UsbHost.h"
