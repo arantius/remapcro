@@ -63,33 +63,18 @@ void keyMatrixRead() {
     }
   }
 
-  if (keysNow != keysPrev) {
-#ifdef DEV
-    debugMatrix(keysNow);
-#endif
-    keysPrev = keysNow;
-  }
-}
-
-
-void debugMatrix(uint16_t keysNow) {
-  static uint8_t n = 0;
+  if (keysNow == keysPrev) return;
   
   uint16_t tmpNow = keysNow;
   uint16_t tmpPrev = keysPrev;
   for (uint8_t i = 0; i < 16; i++) {
-    if ( (tmpNow & 1) != (tmpPrev & 1)) {
-      Serial.print(tmpNow & 1 ? " +M" : " -M");
-      Serial.print(i, HEX);
-      n++;
+    if ( (tmpNow & 1) != (tmpPrev & 1) ) {
+      handleMatrixKey(!(tmpNow & 1), i);
     }
     tmpNow >>= 1;
     tmpPrev >>= 1;
   }
 
-  if (n > 9) {
-    n = 0;
-    Serial.println("");
-  }
+  keysPrev = keysNow;
 }
 

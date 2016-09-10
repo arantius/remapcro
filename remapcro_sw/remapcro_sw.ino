@@ -3,16 +3,14 @@
 
 #include "KeyboardPlus.h"
 #include "Matrix.h"
+#include "UsbDev.h"
+#include "UsbHost.h"
 
 
 #define DEV
 #define MATRIX_POLL_PERIOD 16
 
 
-byte buf[8] = {0};
-KeyboardReportParser keyboardReportParser;
-KeyReport *report;
-KeyReport *report_prev;
 USB Usb;
 
 // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\
@@ -38,17 +36,14 @@ void setup() {
     digitalWrite(13, HIGH);
   }
 
-  report = (KeyReport*) malloc(sizeof(struct KeyReport));
-  memcpy(report, buf, 8);
-  report_prev = (KeyReport*) malloc(sizeof(struct KeyReport));
-  memcpy(report_prev, buf, 8);
-
-  KeyboardPlus.begin();
   while (!Serial) { }
 
 #ifdef DEV
   Serial.println("Remapcro start.");
 #endif
+
+  initUsbHost();
+  initUsbDev();
 
   delay( 200 );
 }

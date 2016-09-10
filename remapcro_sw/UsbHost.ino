@@ -1,3 +1,33 @@
+byte buf[8] = {0};
+KeyboardReportParser keyboardReportParser;
+KeyReport *reportIn;
+KeyReport *reportInPrev;
+
+// \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\
+
+void initUsbHost() {
+#ifdef DEV
+  Serial.println("Init USB host ...");
+#endif
+
+  KeyboardPlus.begin();
+
+  reportIn = (KeyReport*) malloc(sizeof(struct KeyReport));
+  memset(reportIn, 0, 8);
+  reportInPrev = (KeyReport*) malloc(sizeof(struct KeyReport));
+  memset(reportInPrev, 0, 8);
+}
+
+bool reportContains(KeyReport* report, byte key) {
+  for (uint8_t i = 0; i < 6; i++) {
+    if (report->keys[i] == key) return true;
+    if (report->keys[i] == 0) return false;
+  }
+  return false;
+}
+
+// \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\
+
 class HIDSelector : public HIDComposite {
   public:
     HIDSelector(USB *p) : HIDComposite(p) {};
@@ -22,60 +52,31 @@ void HIDSelector::ParseHIDData(
   // Default report parser handles LED twiddling.
   keyboardReportParser.Parse(hid, is_rpt_id, len, buf);
 
-  memcpy(report, buf, len);
-  KeyboardPlus.sendReport(report);
+  memcpy(reportIn, buf, len);
 
-#ifdef DEV
-  debugReport();
-#endif
+  if (reportInPrev->modifiers != reportIn->modifiers) {
+    handleModifiers(reportIn->modifiers);
+  }
+
+  for (uint8_t i = 0; i < 6; i++) {
+    uint8_t key = reportIn->keys[i];
+    if (key == 0) break;
+    if (key == 1) return;  // Error reports "1".
+    if (!reportContains(reportInPrev, key)) {
+      handleUsbKey(1, key);
+    }
+  }
+
+  for (uint8_t i = 0; i < 6; i++) {
+    uint8_t key = reportInPrev->keys[i];
+    if (key == 0) break;
+    if (!reportContains(reportIn, key)) {
+      handleUsbKey(0, key);
+    }
+  }
+
+  memcpy(reportInPrev, reportIn, 8);
 }
 
 HIDSelector hidSelector(&Usb);
-
-// \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\
-
-bool report_contains(KeyReport* report, byte key) {
-  for (uint8_t i = 0; i < 6; i++) {
-    if (report->keys[i] == key) return true;
-    if (report->keys[i] == 0) return false;
-  }
-  return false;
-}
-
-void debugReport() {
-  static uint8_t n = 0;
-
-  if (report_prev->modifiers != report->modifiers) {
-    Serial.print(F(" Mod"));
-    n++;
-  }
-
-  for (uint8_t i = 0; i < 6; i++) {
-    uint8_t key = report->keys[i];
-    if (key == 0) break;
-    if (key == 1) return;  // Error reports "1".
-    if (!report_contains(report_prev, key)) {
-      Serial.print(F(" +"));
-      Serial.print(key, HEX);
-      n++;
-    }
-  }
-
-  for (uint8_t i = 0; i < 6; i++) {
-    uint8_t key = report_prev->keys[i];
-    if (key == 0) break;
-    if (!report_contains(report, key)) {
-      Serial.print(F(" -"));
-      Serial.print(key, HEX);
-      n++;
-    }
-  }
-
-  memcpy(report_prev, report, 8);
-
-  if (n > 9) {
-    n = 0;
-    Serial.println("");
-  }
-}
 
