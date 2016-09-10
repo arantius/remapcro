@@ -72,7 +72,7 @@
 #define KEY_F12       0xCD
 
 //  Low level key report: up to 6 keys and shift, ctrl etc at once
-typedef struct
+typedef struct KeyReport
 {
   uint8_t modifiers;
   uint8_t reserved;
