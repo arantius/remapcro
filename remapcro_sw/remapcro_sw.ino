@@ -7,10 +7,6 @@
 #include "UsbHost.h"
 
 
-#define DEV
-#define MATRIX_POLL_PERIOD 16
-
-
 USB Usb;
 
 // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\
@@ -21,26 +17,17 @@ void setup() {
 
   // Set this to higher values to enable more debug information
   // minimum 0x00, maximum 0xff, default 0x80
-#ifdef DEV
   UsbDEBUGlvl = 0xFF;
-#else
-  UsbDEBUGlvl = 0x00;
-#endif
 
   Serial.begin(74880);
 
   if (Usb.Init() == -1) {
-#ifdef DEV
     Serial.println("USB Init() fail!");
-#endif
     digitalWrite(13, HIGH);
   }
 
   while (!Serial) { }
-
-#ifdef DEV
   Serial.println("Remapcro start.");
-#endif
 
   initUsbHost();
   initUsbDev();

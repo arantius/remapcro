@@ -1,3 +1,7 @@
+// All the functions related to being a USB host, i.e. reading input
+// from the attached USB keyboard and turning it into events that the
+// rest of the system can digest (calling USB device functions).
+
 byte buf[8] = {0};
 KeyboardReportParser keyboardReportParser;
 KeyReport *reportIn;
@@ -6,9 +10,7 @@ KeyReport *reportInPrev;
 // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\
 
 void initUsbHost() {
-#ifdef DEV
   Serial.println("Init USB host ...");
-#endif
 
   KeyboardPlus.begin();
 
