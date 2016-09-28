@@ -11,6 +11,49 @@ KeyReport *reportErr;
 uint8_t isMacroRecording = 0;
 uint8_t macroTargetKey = 0;
 
+
+void debugPrintMacro() {
+  Serial.print(F("TODO: Store macro now:\nOn: "));
+  Serial.println(macroTargetKey, HEX);
+  Serial.print(F("Events: "));
+  for (uint8_t i = 0; i < macroBufLen; i++) {
+    Serial.print(
+        macroBuf[i].type == KeyEventType::modifier
+            ? "M" : macroBuf[i].type == KeyEventType::keyUp ? "-" : "+");
+    Serial.print(macroBuf[i].data, HEX);
+    Serial.print(" ");
+  }
+  Serial.println("");
+}
+
+void handleMacroKey(KeyEventType t, uint8_t d) {
+  if (macroTargetKey == 0) {
+    if (t == KeyEventType::keyUp) {
+      macroTargetKey = d;
+    }
+  } else {
+    if (macroBufLen <= MACRO_BUF_SIZE) {
+      macroBuf[macroBufLen].type = t;
+      macroBuf[macroBufLen].data = d;
+      macroBufLen++;
+    }
+  }
+}
+
+
+void storeMacro() {
+  if (macroBufLen == 0) {
+    Serial.println(F("Abort macro."));
+  } else {
+    debugPrintMacro();
+
+    // TODO: Write to EEPROM/SPI here.
+
+    macroBufLen = 0;
+  }
+}
+
+
 void toggleMacroRecording() {
   if (!isMacroRecording) {
     Serial.println(F("Starting macro record..."));
@@ -20,10 +63,6 @@ void toggleMacroRecording() {
     isMacroRecording = 0;
     storeMacro();
   }
-}
-
-void storeMacro() {
-  Serial.println(F("TODO: Store macro now."));
 }
 
 // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
@@ -56,13 +95,7 @@ void handleMatrixKey(uint8_t pressed, uint8_t key) {
 
 void handleModifiers(uint8_t modifiers) {
   if (isMacroRecording) {
-    // TODO: DRY this up, record the target key.
-    KeyEvent ke;
-    ke.type = KeyEventType::modifier;
-    ke.data = modifiers;
-    if (macroBufLen <= MACRO_BUF_SIZE) {
-      macroBuf[macroBufLen++] = ke;
-    }
+    handleMacroKey(KeyEventType::modifier, modifiers);
   } else {
     reportOut->modifiers = modifiers;
     sendReport();
@@ -77,13 +110,10 @@ void handleUsbKey(uint8_t pressed, uint8_t key) {
   }
 
   if (isMacroRecording) {
-    KeyEvent ke;
-    ke.type = pressed ? KeyEventType::keyDown : KeyEventType::keyUp;
-    ke.data = key;
-    if (macroBufLen <= MACRO_BUF_SIZE) {
-      macroBuf[macroBufLen++] = ke;
-    }
-  } else if (pressed) {
+    handleMacroKey(pressed ? KeyEventType::keyDown : KeyEventType::keyUp, key);
+  }
+
+  if (pressed) {
     for (uint8_t i = 0; i < 6; i++) {
       if (reportOut->keys[i] == key) {
         // Already pressed.
