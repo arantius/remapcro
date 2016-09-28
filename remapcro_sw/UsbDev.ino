@@ -6,7 +6,7 @@
 KeyReport *reportOut;
 KeyReport *reportErr;
 
-// \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\
+// \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
 
 uint8_t isMacroRecording = 0;
 uint8_t macroTargetKey = 0;
@@ -26,7 +26,7 @@ void storeMacro() {
   Serial.println(F("TODO: Store macro now."));
 }
 
-// \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\
+// \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
 
 #define MATRIX_STAR 15
 #define MATRIX_HASH 7
@@ -41,13 +41,13 @@ void handleMatrixKey(uint8_t pressed, uint8_t key) {
       Serial.println(F("TODO: Remap mode activate here."));
     }
   } else {
-    /* *
+    /*
     Serial.print(F("handleMatrixKey("));
     Serial.print(pressed);
     Serial.print(F(", "));
     Serial.print(key, HEX);
     Serial.println(F(");"));
-    /*  */
+    */
 
     handleUsbKey(pressed, pgm_read_byte_near(matrixMap + key));
   }
@@ -113,7 +113,7 @@ void handleUsbKey(uint8_t pressed, uint8_t key) {
   }
 }
 
-// \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\
+// \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
 
 void initUsbDev() {
   Serial.println("Init USB device ...");
@@ -132,7 +132,7 @@ void sendErrReport() {
 
 
 void sendReport() {
-  /* *
+  /*
   Serial.print("Sending report to CPU: ");
   char tmp[8];
   sprintf(tmp, "%02x 00 ", reportOut->modifiers);
@@ -142,8 +142,7 @@ void sendReport() {
     Serial.print(tmp);
   }
   Serial.println();
-  /* */
+  */
 
   KeyboardPlus.sendReport(reportOut);
 }
-

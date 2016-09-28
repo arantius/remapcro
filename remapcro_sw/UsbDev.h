@@ -3,6 +3,8 @@ void handleModifiers(uint8_t modifiers);
 void handleUsbKey(uint8_t pressed, uint8_t key);
 void initUsbDev();
 
+void sendErrReport();
+
 
 enum class KeyEventType : byte { invalid, keyDown, keyUp, modifier };
 struct KeyEvent  {

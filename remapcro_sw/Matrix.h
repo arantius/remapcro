@@ -11,3 +11,4 @@ const uint8_t matrixMap[16] PROGMEM = {
 
 
 void keyMatrixRead();
+

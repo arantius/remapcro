@@ -19,7 +19,6 @@ to the arrangement and reading pattern, the keys end up in bit positions
 
 IOW from bottom left counting up then right.
 */
-
 void keyMatrixRead() {
   static uint8_t isErr = 0;
 

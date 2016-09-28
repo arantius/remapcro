@@ -9,7 +9,7 @@
 
 USB Usb;
 
-// \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\
+// \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
 
 void setup() {
   pinMode(13, OUTPUT);
@@ -20,19 +20,19 @@ void setup() {
   UsbDEBUGlvl = 0xFF;
 
   Serial.begin(74880);
+  while (!Serial) { }
 
   if (Usb.Init() == -1) {
     Serial.println("USB Init() fail!");
     digitalWrite(13, HIGH);
   }
 
-  while (!Serial) { }
   Serial.println("Remapcro start.");
 
-  initUsbHost();
   initUsbDev();
+  initUsbHost();
 
-  delay( 200 );
+  delay(200);
 }
 
 

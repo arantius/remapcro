@@ -7,7 +7,7 @@ KeyboardReportParser keyboardReportParser;
 KeyReport *reportIn;
 KeyReport *reportInPrev;
 
-// \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\
+// \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
 
 void initUsbHost() {
   Serial.println("Init USB host ...");
@@ -20,6 +20,7 @@ void initUsbHost() {
   memset(reportInPrev, 0, 8);
 }
 
+
 bool reportContains(KeyReport* report, byte key) {
   for (uint8_t i = 0; i < 6; i++) {
     if (report->keys[i] == key) return true;
@@ -28,7 +29,7 @@ bool reportContains(KeyReport* report, byte key) {
   return false;
 }
 
-// \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\
+// \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
 
 class HIDSelector : public HIDComposite {
   public:
@@ -82,6 +83,7 @@ void HIDSelector::ParseHIDData(
 
   memcpy(reportInPrev, reportIn, 8);
 }
+
 
 HIDSelector hidSelector(&Usb);
 
