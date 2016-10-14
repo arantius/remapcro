@@ -156,14 +156,14 @@ void initUsbDev() {
 
 
 void sendErrReport() {
-  Serial.println("Sending error report");
+  Serial.println(F("Sending error report"));
   KeyboardPlus.sendReport(reportErr);
 }
 
 
 void sendReport() {
   /*
-  Serial.print("Sending report to CPU: ");
+  Serial.print(F("Sending report to CPU: "));
   char tmp[8];
   sprintf(tmp, "%02x 00 ", reportOut->modifiers);
   Serial.print(tmp);

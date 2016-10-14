@@ -23,16 +23,18 @@ void setup() {
   while (!Serial) { }
 
   if (Usb.Init() == -1) {
-    Serial.println("USB Init() fail!");
+    Serial.println(F("USB Init() fail!"));
     digitalWrite(13, HIGH);
   }
 
-  Serial.println("Remapcro start.");
+  Serial.println(F("Remapcro starting..."));
 
   initUsbDev();
   initUsbHost();
 
   delay(200);
+
+  Serial.println(F("...started!"));
 }
 
 

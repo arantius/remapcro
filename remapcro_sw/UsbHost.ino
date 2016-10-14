@@ -10,7 +10,7 @@ KeyReport *reportInPrev;
 // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
 
 void initUsbHost() {
-  Serial.println("Init USB host ...");
+  Serial.println(F("Init USB host ..."));
 
   KeyboardPlus.begin();
 
