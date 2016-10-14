@@ -1,5 +1,8 @@
 #define MATRIX_POLL_PERIOD 16
 
+#define MATRIX_STAR 15
+#define MATRIX_HASH 7
+
 
 // Map from matrix number to (default) report value.  The obvious values
 // except nulls for the "*" and "#" keys which have special meaning.

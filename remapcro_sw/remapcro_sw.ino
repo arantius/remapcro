@@ -1,6 +1,7 @@
 #include <hidboot.h>
 #include <hidcomposite.h>
 
+#include "Flash.h"
 #include "KbPlus.h"
 #include "Matrix.h"
 #include "UsbDev.h"
@@ -12,9 +13,6 @@ USB Usb;
 // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
 
 void setup() {
-  pinMode(13, OUTPUT);
-  digitalWrite(13, LOW);
-
   // Set this to higher values to enable more debug information
   // minimum 0x00, maximum 0xff, default 0x80
   UsbDEBUGlvl = 0xFF;
@@ -24,11 +22,11 @@ void setup() {
 
   if (Usb.Init() == -1) {
     Serial.println(F("USB Init() fail!"));
-    digitalWrite(13, HIGH);
   }
 
   Serial.println(F("Remapcro starting..."));
 
+  initFlash();
   initUsbDev();
   initUsbHost();
 
@@ -40,10 +38,19 @@ void setup() {
 
 void loop() {
   static uint32_t tmPollMatrix = 0;
+  static uint32_t tmBlinkMacroLed = 0;
+
   uint32_t now = millis();
   if (now > tmPollMatrix) {
     keyMatrixRead();
     tmPollMatrix = now + MATRIX_POLL_PERIOD;
+  }
+
+  if (macroLedBlinking) {
+    if (now > tmBlinkMacroLed) {
+      digitalWrite(MACRO_LED_PIN, !digitalRead(MACRO_LED_PIN));
+      tmBlinkMacroLed = now + MACRO_LED_BLINK_PERIOD;
+    }
   }
 
   Usb.Task();

@@ -1,10 +1,25 @@
 // All the functions related to being a USB device, i.e. handling all
 // the events coming from elsewhere to transmit data to the computer.
 // Sometimes, this also means special functions (recording or
-// transmitting a macro/remap).
+// transmitting a macro/remap).  The bulk of the project!
 
 KeyReport *reportOut;
 KeyReport *reportErr;
+
+// \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
+
+void initUsbDev() {
+  Serial.println(F("Init USB device ..."));
+
+  pinMode(MACRO_LED_PIN, OUTPUT);
+  digitalWrite(MACRO_LED_PIN, HIGH);
+
+  reportOut = (KeyReport*) malloc(sizeof(struct KeyReport));
+  memset(reportOut, 0, 8);
+
+  memset(reportErr, 0, 2);
+  memset(reportErr->keys, 1, 6);
+}
 
 // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
 
@@ -12,44 +27,17 @@ uint8_t isMacroRecording = 0;
 uint8_t macroTargetKey = 0;
 
 
-void debugPrintMacro() {
-  Serial.print(F("TODO: Store macro now:\nOn: "));
-  Serial.println(macroTargetKey, HEX);
-  Serial.print(F("Events: "));
-  for (uint8_t i = 0; i < macroBufLen; i++) {
-    Serial.print(
-        macroBuf[i].type == KeyEventType::modifier
-            ? "M" : macroBuf[i].type == KeyEventType::keyUp ? "-" : "+");
-    Serial.print(macroBuf[i].data, HEX);
-    Serial.print(" ");
-  }
-  Serial.println("");
-}
-
-void handleMacroKey(KeyEventType t, uint8_t d) {
+uint8_t handleMacroKey(KeyEventType t, uint8_t d) {
   if (macroTargetKey == 0) {
     if (t == KeyEventType::keyUp) {
+      macroLedBlinking = 0;
+      digitalWrite(MACRO_LED_PIN, LOW);
       macroTargetKey = d;
     }
+    return 1;
   } else {
-    if (macroBufLen <= MACRO_BUF_SIZE) {
-      macroBuf[macroBufLen].type = t;
-      macroBuf[macroBufLen].data = d;
-      macroBufLen++;
-    }
-  }
-}
-
-
-void storeMacro() {
-  if (macroBufLen == 0) {
-    Serial.println(F("Abort macro."));
-  } else {
-    debugPrintMacro();
-
-    // TODO: Write to EEPROM/SPI here.
-
-    macroBufLen = 0;
+    // TODO: Write to flash, increment size-so-far, etc. here!
+    return 0;
   }
 }
 
@@ -58,17 +46,15 @@ void toggleMacroRecording() {
   if (!isMacroRecording) {
     Serial.println(F("Starting macro record..."));
     isMacroRecording = 1;
-    // TODO: Light "macro is recording" LED.
+    macroLedBlinking = 1;
   } else {
     isMacroRecording = 0;
-    storeMacro();
+    digitalWrite(MACRO_LED_PIN, HIGH);
+    // TODO: Finish write here!
   }
 }
 
 // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
-
-#define MATRIX_STAR 15
-#define MATRIX_HASH 7
 
 void handleMatrixKey(uint8_t pressed, uint8_t key) {
   if (key == MATRIX_STAR) {
@@ -110,8 +96,12 @@ void handleUsbKey(uint8_t pressed, uint8_t key) {
   }
 
   if (isMacroRecording) {
-    handleMacroKey(pressed ? KeyEventType::keyDown : KeyEventType::keyUp, key);
+    uint8_t res = handleMacroKey(
+        pressed ? KeyEventType::keyDown : KeyEventType::keyUp, key);
+    if (res) return;
   }
+
+  // TODO: Check for macro mapping on `key` here.
 
   if (pressed) {
     for (uint8_t i = 0; i < 6; i++) {
@@ -144,16 +134,6 @@ void handleUsbKey(uint8_t pressed, uint8_t key) {
 }
 
 // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
-
-void initUsbDev() {
-  Serial.println("Init USB device ...");
-  reportOut = (KeyReport*) malloc(sizeof(struct KeyReport));
-  memset(reportOut, 0, 8);
-
-  memset(reportErr, 0, 2);
-  memset(reportErr->keys, 1, 6);
-}
-
 
 void sendErrReport() {
   Serial.println(F("Sending error report"));
