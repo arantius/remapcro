@@ -135,33 +135,27 @@ void handleUsbKey(uint8_t pressed, uint8_t key) {
   uint8_t macroSector = EEPROM.read(EEPROM_MACRO_SECTORS_BASE + key);
   if (macroSector) {
     if (!pressed) replayMacro(macroSector);
-  } else if (pressed) {
+  } else {
     for (uint8_t i = 0; i < 6; i++) {
       if (reportOut->keys[i] == key) {
-        // Already pressed.
+        if (!pressed) {
+          if (i < 5) {
+            memmove(&reportOut->keys[i], &reportOut->keys[i+1], 6 - i);
+          }
+          reportOut->keys[5] = 0x00;
+          sendReport();
+        }
         return;
       } else if (reportOut->keys[i] == 0x00) {
-        reportOut->keys[i] = key;
-        sendReport();
+        if (pressed) {
+          reportOut->keys[i] = key;
+          sendReport();
+        }
         return;
       }
     }
     // Would have returned above in case of success.
     sendErrReport();
-  } else {
-    for (uint8_t i = 0; i < 6; i++) {
-      if (reportOut->keys[i] == key) {
-        if (i < 5) {
-          memmove(&reportOut->keys[i], &reportOut->keys[i+1], 6 - i);
-        }
-        reportOut->keys[5] = 0x00;
-        sendReport();
-        return;
-      } else if (reportOut->keys[i] == 0x00) {
-        // Wasn't pressed, ignore.
-        return;
-      }
-    }
   }
 }
 
