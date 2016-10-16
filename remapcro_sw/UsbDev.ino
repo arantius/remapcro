@@ -68,6 +68,7 @@ void toggleMacroRecording() {
   } else {
     Serial.println(F("Finishing macro record..."));
     isMacroRecording = 0;
+    macroLedBlinking = 0;
 
     if (macroSize > 0) {
       uint8_t sz[2];
@@ -131,9 +132,10 @@ void handleUsbKey(uint8_t pressed, uint8_t key) {
     if (res) return;
   }
 
-  // TODO: Check for macro mapping on `key` here.
-
-  if (pressed) {
+  uint8_t macroSector = EEPROM.read(EEPROM_MACRO_SECTORS_BASE + key);
+  if (macroSector) {
+    if (!pressed) replayMacro(macroSector);
+  } else if (pressed) {
     for (uint8_t i = 0; i < 6; i++) {
       if (reportOut->keys[i] == key) {
         // Already pressed.
@@ -161,6 +163,79 @@ void handleUsbKey(uint8_t pressed, uint8_t key) {
       }
     }
   }
+}
+
+void replayMacro(uint8_t sector) {
+  Serial.println(F("Sending macro: "));
+  uint32_t addr = (sector << 12);
+  uint16_t size;
+  uint8_t size8[2];
+  flashRead(addr, 2, size8);
+  size = (size8[0]<<8) + size8[1];
+  addr += 2;
+
+  if (size == 0xFFFF) {
+    Serial.println(F("Error, flash sector empty."));
+    return;
+  } else if (size > 0x1000 - 2) {
+    Serial.print(F("Error, impossibly large size: 0x"));
+    Serial.println(size, HEX);
+    return;
+  }
+
+  KeyReport *report;
+  report = (KeyReport*) malloc(sizeof(struct KeyReport));
+  memset(reportOut, 0, 8);
+
+  uint8_t i = 16, modifierMode = 0, buf[16] = {0};
+  uint16_t tmNext = millis();
+  while (size) {
+    if (i == 16) {
+      i = 0;
+      flashRead(addr, 16, buf);
+      addr += 16;
+    }
+
+    uint8_t key = buf[i];
+    Serial.print(key, HEX); Serial.print(" ");
+    if (key == 0x00) {
+      modifierMode = 1;
+    } else {
+      if (modifierMode) {
+        modifierMode = 0;
+        report->modifiers = key;
+      } else {
+        for (uint8_t j = 0; j < 6; j++) {
+          if (report->keys[i] == key) {
+            // Key is in report, remove it.
+            if (j < 5) {
+              memmove(&reportOut->keys[i], &reportOut->keys[j+1], 6 - i);
+            }
+            reportOut->keys[5] = 0x00;
+            break;
+          } else if (reportOut->keys[j] == 0x00) {
+            // Key is not in report, add it.
+            reportOut->keys[j] = key;
+            break;
+          }
+        }
+      }
+
+      sendReport();
+    }
+
+    while (millis() < tmNext) ;;
+    tmNext = millis() + 33;
+
+    size--;
+    i++;
+  };
+
+  memset(reportOut, 0, 8);
+  sendReport();
+
+  free(report);
+  Serial.println("");
 }
 
 // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
