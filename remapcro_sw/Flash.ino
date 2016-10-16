@@ -8,30 +8,46 @@ void initFlash() {
 
 // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
 
-//#define SPI_COMMAND_DBG
+//#define FLASH_COMMAND_DBG
+
+void flashEraseChip() {
+#ifdef FLASH_COMMAND_DBG
+  Serial.print(F("flashEraseChip()");
+#endif
+
+  flashWriteEnable();
+
+  digitalWrite(FLASH_CE_PIN, LOW);
+  SPI.transfer(FLASH_COMMAND_CHIP_ER);
+  digitalWrite(FLASH_CE_PIN, HIGH);
+
+  // TODO: Only block at the next operation, if necessary?
+  flashWaitForWriteCompletion();
+}
+
 
 void flashEraseSector(uint8_t sector) {
-#ifdef SPI_COMMAND_DBG
+#ifdef FLASH_COMMAND_DBG
   Serial.print(F("flashEraseSector("));
   Serial.print(sector, HEX);
   Serial.println(F(");"));
 #endif
 
-  spiWriteEnable();
+  flashWriteEnable();
 
   digitalWrite(FLASH_CE_PIN, LOW);
   SPI.transfer(FLASH_COMMAND_BLOCK_ER);
-  spiSendSectorAddr(sector);
+  flashSendSectorAddr(sector);
   digitalWrite(FLASH_CE_PIN, HIGH);
 
   // TODO: Only block at the next operation, if necessary?
-  spiWaitForWriteCompletion();
+  flashWaitForWriteCompletion();
 }
 
 
 void flashRead(uint32_t addr, uint8_t size, uint8_t *dst) {
-#ifdef SPI_COMMAND_DBG
-  Serial.print(F("spiFlashRead("));
+#ifdef FLASH_COMMAND_DBG
+  Serial.print(F("flashRead("));
   Serial.print(addr, HEX);
   Serial.print(F(", "));
   Serial.print(size, HEX);
@@ -40,7 +56,7 @@ void flashRead(uint32_t addr, uint8_t size, uint8_t *dst) {
 
   digitalWrite(FLASH_CE_PIN, LOW);
   SPI.transfer(FLASH_COMMAND_READ);
-  spiSendAddr(addr);
+  flashSendAddr(addr);
   while (size) {
     *dst = SPI.transfer(0x00);
     dst++;
@@ -51,20 +67,20 @@ void flashRead(uint32_t addr, uint8_t size, uint8_t *dst) {
 
 
 void flashWrite(uint32_t addr, uint8_t size, uint8_t *src) {
-#ifdef SPI_COMMAND_DBG
-  Serial.print(F("spiFlashWrite("));
+#ifdef FLASH_COMMAND_DBG
+  Serial.print(F("flashWrite("));
   Serial.print(addr, HEX);
   Serial.print(F(", "));
   Serial.print(size, HEX);
   Serial.println(F(");"));
 #endif
 
-  spiWriteEnable();
+  flashWriteEnable();
 
   while (size) {
     digitalWrite(FLASH_CE_PIN, LOW);
     SPI.transfer(FLASH_COMMAND_PAGE_PROG);
-    spiSendAddr(addr);
+    flashSendAddr(addr);
     while (size) {
       SPI.transfer(*src);
       addr++;
@@ -79,7 +95,7 @@ void flashWrite(uint32_t addr, uint8_t size, uint8_t *src) {
   }
 
   // TODO: Only block at the next operation, if necessary?
-  spiWaitForWriteCompletion();
+  flashWaitForWriteCompletion();
 }
 
 
@@ -101,14 +117,14 @@ uint8_t selectUnusedFlashSector() {
 
 // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
 
-void spiSendAddr(uint32_t addr) {
+void flashSendAddr(uint32_t addr) {
   SPI.transfer((addr & 0x00FF0000) >> 16);
   SPI.transfer((addr & 0x0000FF00) >> 8);
   SPI.transfer((addr & 0x000000FF));
 }
 
 
-void spiSendSectorAddr(uint8_t sector) {
+void flashSendSectorAddr(uint8_t sector) {
   // To turn sector number (of 0-255) into byte address (of 1024*1024),
   // Shift left twelve bits.  Out of a 24 bit address, that means the
   // bytes go: 0x0H 0xL0 0x00.
@@ -118,7 +134,7 @@ void spiSendSectorAddr(uint8_t sector) {
 }
 
 
-void spiWaitForWriteCompletion() {
+void flashWaitForWriteCompletion() {
   uint8_t status;
   do {
     digitalWrite(FLASH_CE_PIN, LOW);
@@ -129,7 +145,7 @@ void spiWaitForWriteCompletion() {
 }
 
 
-void spiWriteEnable() {
+void flashWriteEnable() {
   digitalWrite(FLASH_CE_PIN, LOW);
   SPI.transfer(FLASH_COMMAND_WREN);
   digitalWrite(FLASH_CE_PIN, HIGH);

@@ -81,6 +81,8 @@ be discovered quite rapidly.
 
 
 void initFlash();
+
+void flashEraseChip();
 void flashEraseSector(uint8_t sector);
 void flashRead(uint32_t addr, uint8_t size, uint8_t *dst);
 void flashWrite(uint32_t addr, uint8_t size, uint8_t *src);
