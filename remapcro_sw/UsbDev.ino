@@ -69,14 +69,16 @@ void toggleMacroRecording() {
     Serial.println(F("Finishing macro record..."));
     isMacroRecording = 0;
 
-    uint8_t sz[2];
-    sz[0] = (macroSize >> 8) & 0xFF;
-    sz[1] = macroSize & 0xFF;
-    Serial.print(F("Write macro size: "));
-    Serial.print(sz[0], HEX); Serial.print(" ");
-    Serial.print(sz[1], HEX); Serial.println(" ");
-    flashWrite( (macroTargetSector << 12), 2, sz);
-    EEPROM.write(EEPROM_MACRO_SECTORS_BASE + macroTargetKey, macroTargetSector);
+    if (macroSize > 0) {
+      uint8_t sz[2];
+      sz[0] = (macroSize >> 8) & 0xFF;
+      sz[1] = macroSize & 0xFF;
+      Serial.print(F("Write macro size: "));
+      Serial.print(sz[0], HEX); Serial.print(" ");
+      Serial.print(sz[1], HEX); Serial.println(" ");
+      flashWrite( (macroTargetSector << 12), 2, sz);
+      EEPROM.write(EEPROM_MACRO_SECTORS_BASE + macroTargetKey, macroTargetSector);
+    }
 
     digitalWrite(MACRO_LED_PIN, HIGH);
   }
