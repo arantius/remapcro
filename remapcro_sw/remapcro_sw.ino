@@ -1,3 +1,4 @@
+#include <EEPROM.h>
 #include <hidboot.h>
 #include <hidcomposite.h>
 

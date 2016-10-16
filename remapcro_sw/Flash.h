@@ -36,6 +36,10 @@ be discovered quite rapidly.
 */
 
 
+// EEPROM bytes 0-255 store the sector number where the macro for that
+// key is stored.
+#define EEPROM_MACRO_SECTORS_BASE 0
+
 #define FLASH_CE_PIN 8
 
 // Commands.
@@ -69,9 +73,16 @@ be discovered quite rapidly.
 #define FLASH_STATUS_QE  0x40
 #define FLASH_STATUS_SRWD 0x80
 
+// Manipulate bits in a mask made of an array of uint8_t's.
+// http://stackoverflow.com/a/30590727/91238
+#define bitMaskSet(A,k)   ( A[(k/8)] |=  (1 << (k%8)) )
+#define bitMaskClear(A,k) ( A[(k/8)] &= ~(1 << (k%8)) )
+#define bitMaskTest(A,k)  ( A[(k/8)] &   (1 << (k%8)) )
+
 
 void initFlash();
 void flashEraseSector(uint8_t sector);
 void flashRead(uint32_t addr, uint8_t size, uint8_t *dst);
 void flashWrite(uint32_t addr, uint8_t size, uint8_t *src);
+uint8_t selectUnusedFlashSector();
 

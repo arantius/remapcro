@@ -24,7 +24,10 @@ void initUsbDev() {
 // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
 
 uint8_t isMacroRecording = 0;
+uint16_t macroSize = 0;
+uint32_t macroTargetAddr = 0;
 uint8_t macroTargetKey = 0;
+uint8_t macroTargetSector = 0;
 
 
 uint8_t handleMacroKey(KeyEventType t, uint8_t d) {
@@ -32,13 +35,28 @@ uint8_t handleMacroKey(KeyEventType t, uint8_t d) {
     if (t == KeyEventType::keyUp) {
       macroLedBlinking = 0;
       digitalWrite(MACRO_LED_PIN, LOW);
+      macroSize = 0;
       macroTargetKey = d;
+      macroTargetSector = selectUnusedFlashSector();
+      Serial.print(F("Selected macro sector: "));
+      Serial.println(macroTargetSector, HEX);
+      macroTargetAddr = (macroTargetSector << 12) + 2;  // +2 for size
     }
     return 1;
   } else {
-    // TODO: Write to flash, increment size-so-far, etc. here!
+    if (t == KeyEventType::modifier) {
+      writeOneMacroByte((uint8_t*) "\0");
+    }
+    writeOneMacroByte(&d);
+
     return 0;
   }
+}
+
+void writeOneMacroByte(uint8_t *val) {
+  flashWrite(macroTargetAddr, 1, val);
+  macroTargetAddr++;
+  macroSize++;
 }
 
 
@@ -48,9 +66,19 @@ void toggleMacroRecording() {
     isMacroRecording = 1;
     macroLedBlinking = 1;
   } else {
+    Serial.println(F("Finishing macro record..."));
     isMacroRecording = 0;
+
+    uint8_t sz[2];
+    sz[0] = (macroSize >> 8) & 0xFF;
+    sz[1] = macroSize & 0xFF;
+    Serial.print(F("Write macro size: "));
+    Serial.print(sz[0], HEX); Serial.print(" ");
+    Serial.print(sz[1], HEX); Serial.println(" ");
+    flashWrite( (macroTargetSector << 12), 2, sz);
+    EEPROM.write(EEPROM_MACRO_SECTORS_BASE + macroTargetKey, macroTargetSector);
+
     digitalWrite(MACRO_LED_PIN, HIGH);
-    // TODO: Finish write here!
   }
 }
 

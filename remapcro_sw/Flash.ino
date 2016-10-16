@@ -1,8 +1,5 @@
 // All the functions related to interacting with the Flash storage chip.
 
-#include "Flash.h"
-
-
 void initFlash() {
   Serial.println(F("Init Flash ..."));
   pinMode(FLASH_CE_PIN, OUTPUT);
@@ -83,6 +80,23 @@ void flashWrite(uint32_t addr, uint8_t size, uint8_t *src) {
 
   // TODO: Only block at the next operation, if necessary?
   spiWaitForWriteCompletion();
+}
+
+
+uint8_t selectUnusedFlashSector() {
+  // Load into a bitmask the full set of used sectors.
+  uint8_t usedSectors[32] = {0};
+  for (uint8_t i = 1; i > 0; i++) {
+    if (EEPROM.read(EEPROM_MACRO_SECTORS_BASE + i)) {
+      bitMaskSet(usedSectors, i);
+    }
+  }
+  // Pick a random sector.
+  randomSeed(millis());
+  uint8_t sector = (uint8_t) random(255);
+  // Increment until we find an un-set bit (un-used sector).
+  while (bitMaskTest(usedSectors, sector)) sector++;
+  return sector;
 }
 
 // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
