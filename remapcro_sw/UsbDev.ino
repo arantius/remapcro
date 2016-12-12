@@ -132,7 +132,10 @@ void handleUsbKey(uint8_t pressed, uint8_t key) {
     if (res) return;
   }
 
-  uint8_t macroSector = EEPROM.read(EEPROM_MACRO_SECTORS_BASE + key);
+  uint8_t macroSector = 0;
+  // Only look up macro contents if we are not currently recording a macro!
+  if (!isMacroRecording) EEPROM.read(EEPROM_MACRO_SECTORS_BASE + key);
+
   if (macroSector) {
     if (!pressed) replayMacro(macroSector);
   } else {
