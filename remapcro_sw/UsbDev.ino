@@ -181,6 +181,8 @@ void handleUsbKey(uint8_t pressed, uint8_t key) {
 }
 
 void replayMacro(uint8_t sector) {
+  digitalWrite(MACRO_LED_PIN, LOW);
+
 #ifdef FLASH_COMMAND_DBG
   Serial.print(F("Sending macro, sector "));
   Serial.print(sector);
@@ -250,7 +252,7 @@ void replayMacro(uint8_t sector) {
 
     if (key != 0x00) {
       while (millis() < tmNext) ;;
-      tmNext = millis() + 33;
+      tmNext = millis() + 20;
     }
 
     size--;
@@ -263,6 +265,8 @@ void replayMacro(uint8_t sector) {
 #ifdef FLASH_COMMAND_DBG
   Serial.println("");
 #endif
+
+  digitalWrite(MACRO_LED_PIN, HIGH);
 }
 
 // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
