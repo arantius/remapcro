@@ -9,6 +9,8 @@
 #include "UsbHost.h"
 
 
+#define SERIAL_DEBUG_CMD
+
 USB Usb;
 
 // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
@@ -56,6 +58,7 @@ void loop() {
 
   Usb.Task();
 
+#ifdef SERIAL_DEBUG_CMD
   if (Serial.available()) {
     char c = Serial.read();
     switch (c) {
@@ -77,12 +80,17 @@ void loop() {
       Serial.print(F("Dumping macro on key "));
       Serial.print(k, HEX);
       uint8_t sector = EEPROM.read(EEPROM_MACRO_SECTORS_BASE + k);
+      Serial.print(F(", sector "));
+      Serial.print(sector);
       uint32_t addr = (sector << 12);
       uint16_t size;
       uint8_t size8[2];
       flashRead(addr, 2, size8);
       size = (size8[0]<<8) + size8[1];
       addr += 2;
+      Serial.print(F(", size "));
+      Serial.print(size8[0], HEX); Serial.print(F(" "));
+      Serial.print(size8[1], HEX); Serial.print(F(" "));
 
       if (size == 0xFFFF) {
         Serial.println(F("Error, flash sector empty."));
@@ -101,23 +109,32 @@ void loop() {
           flashRead(addr, 16, buf);
           addr += 16;
         }
-        Serial.print(buf[i++], HEX);
+        Serial.print(buf[i], HEX);
         Serial.print(" ");
         size--;
-      } while (i > 0);
-      Serial.println("");
+        i++;
+      }
+      Serial.println(F("done."));
       break;
     } case 's': {
-      Serial.print("Dumping macro sector data:");
-      uint8_t i = 0;
+      Serial.println(F("Dumping macro sector data:"));
+      Serial.print(F("   0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F"));
+      uint8_t i = 0, j = 0;
       do {
-        if (0 == i % 16) Serial.println("");
-        Serial.print(EEPROM.read(EEPROM_MACRO_SECTORS_BASE + i++), HEX);
-        Serial.print(" ");
+        if (0 == i % 16) {
+          Serial.println(F(""));
+          Serial.print(j++, HEX);
+          Serial.print(F("  "));
+        }
+        uint8_t s = EEPROM.read(EEPROM_MACRO_SECTORS_BASE + i++);
+        if (s <= 0xF) Serial.print(F("0"));
+        Serial.print(s, HEX);
+        Serial.print(F(" "));
       } while (i > 0);
-      Serial.println("");
+      Serial.println(F(""));
       break;
     } }
   }
+#endif
 }
 
