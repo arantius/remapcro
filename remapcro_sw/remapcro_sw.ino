@@ -21,11 +21,11 @@ void setup() {
   Serial.begin(74880);
   while (!Serial) { }
 
+  Serial.println(F("Remapcro starting..."));
+
   if (Usb.Init() == -1) {
     Serial.println(F("USB Init() fail!"));
   }
-
-  Serial.println(F("Remapcro starting..."));
 
   initFlash();
   initUsbDev();
