@@ -112,6 +112,9 @@ uint8_t selectUnusedFlashSector() {
   uint8_t sector = (uint8_t) random(255);
   // Increment until we find an un-set bit (un-used sector).
   while (bitMaskTest(usedSectors, sector)) sector++;
+
+  flashEraseSector(sector);
+
   return sector;
 }
 
