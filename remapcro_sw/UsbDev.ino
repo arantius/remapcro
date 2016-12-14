@@ -5,6 +5,10 @@
 
 //#define USB_DEV_DBG
 
+
+enum class KeyEventType : byte { invalid, keyDown, keyUp, modifier };
+
+
 KeyReport *reportOut;
 KeyReport *reportErr;
 
