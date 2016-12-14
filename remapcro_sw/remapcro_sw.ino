@@ -21,7 +21,10 @@ void setup() {
   UsbDEBUGlvl = 0xFF;
 
   Serial.begin(74880);
-  while (!Serial) { }
+  for (uint8_t i = 0; i < 255; i++) {
+    if (Serial) break;
+    delay(2);
+  }
 
   Serial.println(F("Remapcro starting..."));
 
