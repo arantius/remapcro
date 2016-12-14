@@ -9,6 +9,7 @@ void handleUsbKey(uint8_t pressed, uint8_t key);
 void initUsbDev();
 
 void sendErrReport();
+void dumpReport();
 
 
 enum class KeyEventType : byte { invalid, keyDown, keyUp, modifier };

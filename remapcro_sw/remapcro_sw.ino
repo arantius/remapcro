@@ -119,6 +119,10 @@ void loop() {
       }
       Serial.println(F("done."));
       break;
+    } case 'r': {
+      Serial.println(F("Current report: "));
+      dumpReport();
+      break;
     } case 's': {
       Serial.println(F("Dumping macro sector data:"));
       Serial.print(F("   0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F"));

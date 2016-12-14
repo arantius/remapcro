@@ -271,6 +271,18 @@ void replayMacro(uint8_t sector) {
 
 // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
 
+void dumpReport() {
+  char tmp[8];
+  sprintf(tmp, "%02x 00 ", reportOut->modifiers);
+  Serial.print(tmp);
+  for (uint8_t i = 0; i < 6; i++) {
+    sprintf(tmp, "%02x ", reportOut->keys[i]);
+    Serial.print(tmp);
+  }
+  Serial.println();
+}
+
+
 void sendErrReport() {
   Serial.println(F("Sending error report"));
   KeyboardPlus.sendReport(reportErr);
@@ -280,14 +292,7 @@ void sendErrReport() {
 void sendReport() {
 #ifdef FLASH_COMMAND_DBG
   Serial.print(F("Sending report to CPU: "));
-  char tmp[8];
-  sprintf(tmp, "%02x 00 ", reportOut->modifiers);
-  Serial.print(tmp);
-  for (uint8_t i = 0; i < 6; i++) {
-    sprintf(tmp, "%02x ", reportOut->keys[i]);
-    Serial.print(tmp);
-  }
-  Serial.println();
+  dumpReport();
 #endif
 
   KeyboardPlus.sendReport(reportOut);
