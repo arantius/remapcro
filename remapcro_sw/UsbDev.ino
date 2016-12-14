@@ -3,7 +3,7 @@
 // Sometimes, this also means special functions (recording or
 // transmitting a macro/remap).  The bulk of the project!
 
-//#define FLASH_COMMAND_DBG
+//#define USB_DEV_DBG
 
 KeyReport *reportOut;
 KeyReport *reportErr;
@@ -35,7 +35,7 @@ uint8_t macroTargetSector = 0;
 uint8_t handleMacroKey(KeyEventType t, uint8_t d) {
   if (macroTargetKey == 0) {
     if (t == KeyEventType::keyUp) {
-#ifdef FLASH_COMMAND_DBG
+#ifdef USB_DEV_DBG
       Serial.print(F("Target macro key: "));
       Serial.println(d, HEX);
 #endif
@@ -44,7 +44,7 @@ uint8_t handleMacroKey(KeyEventType t, uint8_t d) {
       macroSize = 0;
       macroTargetKey = d;
       macroTargetSector = selectUnusedFlashSector();
-#ifdef FLASH_COMMAND_DBG
+#ifdef USB_DEV_DBG
       Serial.print(F("Selected macro sector: "));
       Serial.println(macroTargetSector, HEX);
 #endif
@@ -55,7 +55,7 @@ uint8_t handleMacroKey(KeyEventType t, uint8_t d) {
     if (t == KeyEventType::modifier) {
       writeOneMacroByte((uint8_t*) "\0");
     }
-#ifdef FLASH_COMMAND_DBG
+#ifdef USB_DEV_DBG
     Serial.print(d, HEX); Serial.print(F(" "));
 #endif
     writeOneMacroByte(&d);
@@ -74,14 +74,14 @@ void writeOneMacroByte(uint8_t *val) {
 
 void toggleMacroRecording() {
   if (!isMacroRecording) {
-#ifdef FLASH_COMMAND_DBG
+#ifdef USB_DEV_DBG
     Serial.println(F("Starting macro record..."));
 #endif
     isMacroRecording = 1;
     macroLedBlinking = 1;
     macroTargetKey = 0;
   } else {
-#ifdef FLASH_COMMAND_DBG
+#ifdef USB_DEV_DBG
     Serial.println(F("Finishing macro record..."));
 #endif
     isMacroRecording = 0;
@@ -91,7 +91,7 @@ void toggleMacroRecording() {
       uint8_t sz[2];
       sz[0] = (macroSize >> 8) & 0xFF;
       sz[1] = macroSize & 0xFF;
-#ifdef FLASH_COMMAND_DBG
+#ifdef USB_DEV_DBG
       Serial.print(F("Write macro size: "));
       Serial.print(sz[0], HEX); Serial.print(" ");
       Serial.print(sz[1], HEX); Serial.println(" ");
@@ -117,7 +117,7 @@ void handleMatrixKey(uint8_t pressed, uint8_t key) {
       Serial.println(F("TODO: Remap mode activate here."));
     }
   } else {
-#ifdef FLASH_COMMAND_DBG
+#ifdef USB_DEV_DBG
     Serial.print(F("handleMatrixKey("));
     Serial.print(pressed);
     Serial.print(F(", "));
@@ -183,7 +183,7 @@ void handleUsbKey(uint8_t pressed, uint8_t key) {
 void replayMacro(uint8_t sector) {
   digitalWrite(MACRO_LED_PIN, LOW);
 
-#ifdef FLASH_COMMAND_DBG
+#ifdef USB_DEV_DBG
   Serial.print(F("Sending macro, sector "));
   Serial.print(sector);
   Serial.print(F(", size "));
@@ -204,7 +204,7 @@ void replayMacro(uint8_t sector) {
     Serial.println(size, HEX);
     return;
   } else {
-#ifdef FLASH_COMMAND_DBG
+#ifdef USB_DEV_DBG
     Serial.println(size);
 #endif
   }
@@ -221,7 +221,7 @@ void replayMacro(uint8_t sector) {
     }
 
     uint8_t key = buf[i];
-#ifdef FLASH_COMMAND_DBG
+#ifdef USB_DEV_DBG
     Serial.print(key, HEX); Serial.print(" ");
 #endif
     if (key == 0x00) {
@@ -262,7 +262,7 @@ void replayMacro(uint8_t sector) {
   memset(reportOut, 0, 8);
   sendReport();
 
-#ifdef FLASH_COMMAND_DBG
+#ifdef USB_DEV_DBG
   Serial.println("");
 #endif
 
@@ -290,7 +290,7 @@ void sendErrReport() {
 
 
 void sendReport() {
-#ifdef FLASH_COMMAND_DBG
+#ifdef USB_DEV_DBG
   Serial.print(F("Sending report to CPU: "));
   dumpReport();
 #endif
