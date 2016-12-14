@@ -19,7 +19,9 @@ void initUsbDev() {
   reportOut = (KeyReport*) malloc(sizeof(struct KeyReport));
   memset(reportOut, 0, 8);
 
-  memset(reportErr, 0, 2);
+  reportErr = (KeyReport*) malloc(sizeof(struct KeyReport));
+  reportErr->modifiers = 0;
+  reportErr->reserved = 0;
   memset(reportErr->keys, 1, 6);
 }
 
