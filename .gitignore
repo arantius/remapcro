@@ -3,4 +3,5 @@
 res
 *.bak
 *.bck
-*cache*
+*cache.lib
+*rescue.lib
