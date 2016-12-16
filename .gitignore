@@ -1,7 +1,6 @@
 *.bak
 *.bck
-res
-*.bak
-*.bck
 *cache.lib
+*pcb-bak
 *rescue.lib
+res
