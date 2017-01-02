@@ -28,9 +28,7 @@ void setup() {
 
   Serial.println(F("Remapcro starting..."));
 
-  if (Usb.Init() == -1) {
-    Serial.println(F("USB Init() fail!"));
-  }
+  SPI.begin();
 
   initFlash();
   initUsbDev();

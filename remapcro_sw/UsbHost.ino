@@ -12,6 +12,10 @@ KeyReport *reportInPrev;
 void initUsbHost() {
   Serial.println(F("Init USB host ..."));
 
+  if (Usb.Init() == -1) {
+    Serial.println(F("USB Init() fail!"));
+  }
+
   KeyboardPlus.begin();
 
   reportIn = (KeyReport*) malloc(sizeof(struct KeyReport));
