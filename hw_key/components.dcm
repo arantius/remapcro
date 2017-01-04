@@ -1,3 +1,8 @@
 EESchema-DOCLIB  Version 2.0
 #
+$CMP LED_RABG
+D Common Anode RGB LED
+K RGB LED
+$ENDCMP
+#
 #End Doc Library
