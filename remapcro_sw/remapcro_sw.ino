@@ -9,7 +9,7 @@
 #include "UsbHost.h"
 
 
-#define SERIAL_DEBUG_CMD
+#define SERIAL_CMD_DBG
 
 USB Usb;
 
@@ -67,7 +67,7 @@ void loop() {
 
   Usb.Task();
 
-#ifdef SERIAL_DEBUG_CMD
+#ifdef SERIAL_CMD_DBG
   if (Serial.available()) {
     char c = Serial.read();
     switch (c) {
