@@ -2,7 +2,12 @@
 
 void initFlash() {
   Serial.println(F("Init Flash ..."));
-  pinMode(FLASH_CE_PIN, OUTPUT);
+  Serial.print("Expect JEDEC ID of 9D1344: ");
+  digitalWrite(FLASH_CE_PIN, LOW);
+  SPI.transfer(FLASH_COMMAND_JDEC_ID_READ);
+  Serial.print(SPI.transfer(0xFF), HEX);
+  Serial.print(SPI.transfer(0xFF), HEX);
+  Serial.println(SPI.transfer(0xFF), HEX);
   digitalWrite(FLASH_CE_PIN, HIGH);
 }
 

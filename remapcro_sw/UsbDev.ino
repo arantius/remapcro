@@ -14,9 +14,6 @@ KeyReport *reportErr;
 void initUsbDev() {
   Serial.println(F("Init USB device ..."));
 
-  pinMode(MACRO_LED_PIN, OUTPUT);
-  digitalWrite(MACRO_LED_PIN, HIGH);
-
   reportOut = (KeyReport*) malloc(sizeof(struct KeyReport));
   memset(reportOut, 0, 8);
 
@@ -42,8 +39,8 @@ uint8_t handleMacroKey(KeyEventType t, uint8_t d) {
       Serial.print(F("Target macro key: "));
       Serial.println(d, HEX);
 #endif
-      macroLedBlinking = 0;
-      digitalWrite(MACRO_LED_PIN, LOW);
+      ledBlinking = 0;
+      lightLed(LedColor::green);
       macroSize = 0;
       macroTargetKey = d;
       macroTargetSector = selectUnusedFlashSector();
@@ -81,14 +78,16 @@ void toggleMacroRecording() {
     Serial.println(F("Starting macro record..."));
 #endif
     isMacroRecording = 1;
-    macroLedBlinking = 1;
+    ledBlinking = 1;
+    lightLed(LedColor::green);
     macroTargetKey = 0;
   } else {
 #ifdef USB_DEV_DBG
     Serial.println(F("Finishing macro record..."));
 #endif
     isMacroRecording = 0;
-    macroLedBlinking = 0;
+    ledBlinking = 0;
+    lightLed(LedColor::off);
 
     if (macroSize > 0) {
       uint8_t sz[2];
@@ -101,33 +100,53 @@ void toggleMacroRecording() {
 #endif
       flashWrite( (macroTargetSector << 12), 2, sz);
 
+#ifdef USB_DEV_DBG
+      Serial.print(F("Write macro sector "));
+      Serial.print(macroTargetSector, HEX);
+      Serial.print(F(" for key "));
+      Serial.println(macroTargetKey, HEX);
+#endif
       EEPROM.write(EEPROM_MACRO_SECTORS_BASE + macroTargetKey, macroTargetSector);
     }
 
-    digitalWrite(MACRO_LED_PIN, HIGH);
+    lightLed(LedColor::off);
   }
 }
 
 // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
 
 void handleMatrixKey(uint8_t pressed, uint8_t key) {
-  if (key == MATRIX_STAR) {
-    if (!pressed) {
-      toggleMacroRecording();
-    }
-  } else if (key == MATRIX_HASH) {
-    if (!pressed) {
-      Serial.println(F("TODO: Remap mode activate here."));
-    }
-  } else {
 #ifdef USB_DEV_DBG
-    Serial.print(F("handleMatrixKey("));
-    Serial.print(pressed);
-    Serial.print(F(", "));
-    Serial.print(key, HEX);
-    Serial.println(F(");"));
+  Serial.print(F("handleMatrixKey("));
+  Serial.print(pressed);
+  Serial.print(F(", "));
+  Serial.print(key, HEX);
+  Serial.println(F(");"));
 #endif
-    handleUsbKey(pressed, pgm_read_byte_near(matrixMap + key));
+
+  if (pressed) {
+    // Only react to release of matrix keys.
+    return;
+  }
+
+  if (key == MATRIX_MACRO) {
+    toggleMacroRecording();
+  } else {
+    if (isMacroRecording && macroTargetKey == 0) {
+#ifdef USB_DEV_DBG
+      Serial.println(F("macro recording, with no target."));
+#endif
+      handleMacroKey(KeyEventType::keyUp, MATRIX_MACRO_OFFSET + key);
+    } else if (!isMacroRecording) {
+#ifdef USB_DEV_DBG
+      Serial.println(F("no macro recording..."));
+#endif
+      uint8_t macroSector = EEPROM.read(
+          EEPROM_MACRO_SECTORS_BASE + MATRIX_MACRO_OFFSET + key);
+      if (macroSector != 0x00) {
+        replayMacro(macroSector);
+      }
+    }
   }
 }
 
@@ -184,7 +203,7 @@ void handleUsbKey(uint8_t pressed, uint8_t key) {
 }
 
 void replayMacro(uint8_t sector) {
-  digitalWrite(MACRO_LED_PIN, LOW);
+  lightLed(LedColor::blue);
 
 #ifdef USB_DEV_DBG
   Serial.print(F("Sending macro, sector "));
@@ -201,6 +220,7 @@ void replayMacro(uint8_t sector) {
 
   if (size == 0xFFFF) {
     Serial.println(F("Error, flash sector empty."));
+    lightLed(LedColor::off);
     return;
   } else if (size > 0x1000 - 2) {
     Serial.print(F("Error, impossibly large size: 0x"));
@@ -269,7 +289,7 @@ void replayMacro(uint8_t sector) {
   Serial.println("");
 #endif
 
-  digitalWrite(MACRO_LED_PIN, HIGH);
+  lightLed(LedColor::off);
 }
 
 // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //

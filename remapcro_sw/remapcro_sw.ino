@@ -28,6 +28,12 @@ void setup() {
 
   Serial.println(F("Remapcro starting..."));
 
+  // Before starting SPI, be sure to disable both devices' chip enable pin.
+  pinMode(FLASH_CE_PIN, OUTPUT);
+  digitalWrite(FLASH_CE_PIN, HIGH);
+  pinMode(USB_CE_PIN, OUTPUT);
+  digitalWrite(USB_CE_PIN, HIGH);
+
   SPI.begin();
 
   initFlash();
@@ -43,6 +49,7 @@ void setup() {
 void loop() {
   static uint32_t tmPollMatrix = 0;
   static uint32_t tmBlinkMacroLed = 0;
+  static uint8_t macroBlinkState = 0;
 
   uint32_t now = millis();
   if (now > tmPollMatrix) {
@@ -50,9 +57,10 @@ void loop() {
     tmPollMatrix = now + MATRIX_POLL_PERIOD;
   }
 
-  if (macroLedBlinking) {
+  if (ledBlinking) {
     if (now > tmBlinkMacroLed) {
-      digitalWrite(MACRO_LED_PIN, !digitalRead(MACRO_LED_PIN));
+      macroBlinkState = !macroBlinkState;
+      lightLed(macroBlinkState ? ledColor : LedColor::off);
       tmBlinkMacroLed = now + MACRO_LED_BLINK_PERIOD;
     }
   }
@@ -82,7 +90,7 @@ void loop() {
       Serial.print(k, HEX);
       uint8_t sector = EEPROM.read(EEPROM_MACRO_SECTORS_BASE + k);
       Serial.print(F(", sector "));
-      Serial.print(sector);
+      Serial.print(sector, HEX);
       uint32_t addr = (sector << 12);
       uint16_t size;
       uint8_t size8[2];
@@ -132,8 +140,12 @@ void loop() {
           Serial.print(F("  "));
         }
         uint8_t s = EEPROM.read(EEPROM_MACRO_SECTORS_BASE + i++);
-        if (s <= 0xF) Serial.print(F("0"));
-        Serial.print(s, HEX);
+        if (s == 0) {
+          Serial.print(F("  "));
+        } else {
+          if (s <= 0xF) Serial.print(F("0"));
+          Serial.print(s, HEX);
+        }
         Serial.print(F(" "));
       } while (i > 0);
       Serial.println(F(""));

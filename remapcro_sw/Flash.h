@@ -40,7 +40,7 @@ be discovered quite rapidly.
 // key is stored.
 #define EEPROM_MACRO_SECTORS_BASE 0
 
-#define FLASH_CE_PIN 8
+#define FLASH_CE_PIN 18
 
 // Commands.
 #define FLASH_COMMAND_RDID 0xAB

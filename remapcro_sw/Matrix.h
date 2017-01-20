@@ -1,17 +1,27 @@
 #define MATRIX_POLL_PERIOD 16
+#define MATRIX_MACRO 0
 
-#define MATRIX_STAR 15
-#define MATRIX_HASH 7
-
-
-// Map from matrix number to (default) report value.  The obvious values
-// except nulls for the "*" and "#" keys which have special meaning.
-const uint8_t matrixMap[16] PROGMEM = {
-    0x04, 0x05, 0x06, 0x07,
-    0x5B, 0x5E, 0x61, 0x00,
-    0x5A, 0x5D, 0x60, 0x62,
-    0x59, 0x5C, 0x5F, 0x00};
+// When storing a macro on a key from the "real" keyboard, we use the HID
+// ID of its key to store the macro sector (in EEPROM).  When storing the
+// macro sector for a matrix key, we want to use an ID that won't conflict
+// with those "real" keys.  There's just one byte, and most of the
+// possible values are taken.  The space for F13 through F24 starts at
+// 0x68 and we have twelve (well, eleven ...) possible matrix keys.
+// Seems like a perfect space to reuse.
+#define MATRIX_MACRO_OFFSET 0x68
 
 
+#define PIN_LED_R 6
+#define PIN_LED_G 5
+#define PIN_LED_B 3
+
+enum class LedColor : byte { off, red, green, blue, yellow };
+
+uint8_t ledBlinking = 0;
+LedColor ledColor = LedColor::off;
+
+
+void initMatrix();
 void keyMatrixRead();
+void lightLed(LedColor c);
 
