@@ -1,0 +1,10 @@
+Errors/issues in first boards:
+
+* The micro USB plug on the Arduino Pro Micro sits about 30mil proud of
+  the female USB socket on the UHS mini.
+* The seven pin board interconnect is misaligned.  It's aligned properly
+  when the boards are both face up, but it's off center, so it's no longer
+  aligned when the logic board is flipped into its final orientation.
+* The RGB LED is indeed common cathode, so hooking it to +3v3 won't work.
+* The RGB LED should be rotated 180 so the dimple fits into the matching slot
+  of the key switch.
