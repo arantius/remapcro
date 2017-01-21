@@ -3,7 +3,9 @@
 // Sometimes, this also means special functions (recording or
 // transmitting a macro/remap).  The bulk of the project!
 
-//#define USB_DEV_DBG
+#ifdef DEBUG
+#define USB_DEV_DBG
+#endif
 
 
 KeyReport *reportOut;

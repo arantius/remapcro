@@ -9,7 +9,10 @@
 #include "UsbHost.h"
 
 
+//#define DEBUG
+#ifdef DEBUG
 #define SERIAL_CMD_DBG
+#endif
 
 USB Usb;
 
@@ -18,7 +21,11 @@ USB Usb;
 void setup() {
   // Set this to higher values to enable more debug information
   // minimum 0x00, maximum 0xff, default 0x80
+#ifdef DEBUG
   UsbDEBUGlvl = 0xFF;
+# else
+  UsbDEBUGlvl = 0x00;
+#endif
 
   Serial.begin(74880);
   for (uint8_t i = 0; i < 255; i++) {

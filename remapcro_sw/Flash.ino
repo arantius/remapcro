@@ -1,5 +1,10 @@
 // All the functions related to interacting with the Flash storage chip.
 
+#ifdef DEBUG
+#define FLASH_COMMAND_DBG
+#endif
+
+
 void initFlash() {
   Serial.println(F("Init Flash ..."));
   Serial.print("Expect JEDEC ID of 9D1344: ");
@@ -12,8 +17,6 @@ void initFlash() {
 }
 
 // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
-
-//#define FLASH_COMMAND_DBG
 
 void flashEraseChip() {
 #ifdef FLASH_COMMAND_DBG
