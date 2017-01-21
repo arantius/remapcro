@@ -13,7 +13,7 @@ void initUsbHost() {
   Serial.println(F("Init USB host ..."));
 
   if (Usb.Init() == -1) {
-    Serial.println(F("USB Init() fail!"));
+    Serial.println(F("USB host init fail!"));
   }
 
   KeyboardPlus.begin();
