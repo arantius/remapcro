@@ -25,7 +25,7 @@ void initFlash() {
 
 void flashEraseChip() {
 #ifdef FLASH_COMMAND_DBG
-  Serial.print(F("flashEraseChip()");
+  Serial.print(F("flashEraseChip()"));
 #endif
 
   flashWriteEnable();
