@@ -10,9 +10,6 @@
 
 
 //#define DEBUG
-#ifdef DEBUG
-#define SERIAL_CMD_DBG
-#endif
 
 USB Usb;
 
@@ -74,7 +71,6 @@ void loop() {
 
   Usb.Task();
 
-#ifdef SERIAL_CMD_DBG
   if (Serial.available()) {
     char c = Serial.read();
     switch (c) {
@@ -133,7 +129,7 @@ void loop() {
       Serial.println(F("done."));
       break;
     } case 'r': {
-      Serial.println(F("Current report: "));
+      Serial.print(F("Current report: "));
       dumpReport();
       break;
     } case 's': {
@@ -159,6 +155,5 @@ void loop() {
       break;
     } }
   }
-#endif
 }
 
