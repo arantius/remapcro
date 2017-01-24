@@ -52,8 +52,6 @@ bool HIDSelector::SelectInterface(uint8_t iface, uint8_t proto) {
 
 void HIDSelector::ParseHIDData(
     USBHID *hid, uint8_t ep, bool is_rpt_id, uint8_t len, uint8_t *buf) {
-  digitalWrite(13, !digitalRead(13));
-
   // Default report parser handles LED twiddling.
   keyboardReportParser.Parse(hid, is_rpt_id, len, buf);
 
