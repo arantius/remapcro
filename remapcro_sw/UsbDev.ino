@@ -16,6 +16,8 @@ KeyReport *reportErr;
 void initUsbDev() {
   Serial.println(F("Init USB device ..."));
 
+  KeyboardPlus.begin();
+
   reportOut = (KeyReport*) malloc(sizeof(struct KeyReport));
   memset(reportOut, 0, 8);
 

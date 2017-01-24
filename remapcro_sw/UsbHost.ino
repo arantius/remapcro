@@ -16,8 +16,6 @@ void initUsbHost() {
     Serial.println(F("USB host init fail!"));
   }
 
-  KeyboardPlus.begin();
-
   reportIn = (KeyReport*) malloc(sizeof(struct KeyReport));
   memset(reportIn, 0, 8);
   reportInPrev = (KeyReport*) malloc(sizeof(struct KeyReport));
