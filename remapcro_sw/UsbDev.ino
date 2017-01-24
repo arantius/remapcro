@@ -111,6 +111,8 @@ void toggleMacroRecording() {
       Serial.println(macroTargetKey, HEX);
 #endif
       EEPROM.write(EEPROM_MACRO_SECTORS_BASE + macroTargetKey, macroTargetSector);
+    } else if (macroTargetKey) {
+      EEPROM.write(EEPROM_MACRO_SECTORS_BASE + macroTargetKey, 0x00);
     }
 
     lightLed(LedColor::off);
