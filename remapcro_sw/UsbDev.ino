@@ -36,7 +36,7 @@ uint8_t macroTargetKey = 0;
 uint8_t macroTargetSector = 0;
 
 
-uint8_t handleMacroKey(KeyEventType t, uint8_t d) {
+uint8_t handleKeyDuringMacro(KeyEventType t, uint8_t d) {
   if (macroTargetKey == 0) {
     if (t == KeyEventType::keyUp) {
 #ifdef USB_DEV_DBG
@@ -140,7 +140,7 @@ void handleMatrixKey(uint8_t pressed, uint8_t key) {
 #ifdef USB_DEV_DBG
       Serial.println(F("macro recording, with no target."));
 #endif
-      handleMacroKey(KeyEventType::keyUp, MATRIX_MACRO_OFFSET + key);
+      handleKeyDuringMacro(KeyEventType::keyUp, MATRIX_MACRO_OFFSET + key);
     } else if (!isMacroRecording) {
 #ifdef USB_DEV_DBG
       Serial.println(F("no macro recording..."));
@@ -157,7 +157,7 @@ void handleMatrixKey(uint8_t pressed, uint8_t key) {
 
 void handleModifiers(uint8_t modifiers) {
   if (isMacroRecording) {
-    handleMacroKey(KeyEventType::modifier, modifiers);
+    handleKeyDuringMacro(KeyEventType::modifier, modifiers);
   }
   reportOut->modifiers = modifiers;
   sendReport();
@@ -171,7 +171,7 @@ void handleUsbKey(uint8_t pressed, uint8_t key) {
   }
 
   if (isMacroRecording) {
-    uint8_t res = handleMacroKey(
+    uint8_t res = handleKeyDuringMacro(
         pressed ? KeyEventType::keyDown : KeyEventType::keyUp, key);
     if (res) return;
   }
