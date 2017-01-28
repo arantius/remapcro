@@ -7,6 +7,8 @@
 #define USB_DEV_DBG
 #endif
 
+#define MACRO_READ_BLOCK 16
+
 
 KeyReport *reportOut;
 KeyReport *reportErr;
@@ -241,13 +243,15 @@ void replayMacro(uint8_t sector) {
 
   memset(reportOut, 0, 8);
 
-  uint8_t i = 16, modifierMode = 0, buf[16] = {0};
+  uint8_t i = MACRO_READ_BLOCK;
+  uint8_t modifierMode = 0;
+  uint8_t buf[MACRO_READ_BLOCK] = {0};
   uint16_t tmNext = millis();
   while (size) {
-    if (i == 16) {
+    if (i == MACRO_READ_BLOCK) {
       i = 0;
-      flashRead(addr, 16, buf);
-      addr += 16;
+      flashRead(addr, MACRO_READ_BLOCK, buf);
+      addr += MACRO_READ_BLOCK;
     }
 
     uint8_t key = buf[i];
