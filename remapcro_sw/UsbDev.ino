@@ -184,29 +184,30 @@ void handleUsbKey(uint8_t pressed, uint8_t key) {
 
   if (macroSector) {
     if (!pressed) replayMacro(macroSector);
-  } else {
+    return;
+  } else if (pressed) {
     for (uint8_t i = 0; i < 6; i++) {
-      if (reportOut->keys[i] == key) {
-        if (!pressed) {
-          if (i < 5) {
-            memmove(&reportOut->keys[i], &reportOut->keys[i+1], 6 - i);
-          }
-          reportOut->keys[5] = 0x00;
-          sendReport();
-        }
-        return;
-      } else if (reportOut->keys[i] == 0x00) {
-        if (pressed) {
-          reportOut->keys[i] = key;
-          sendReport();
-        }
+      if (reportOut->keys[i] == 0x00) {
+        reportOut->keys[i] = key;
+        sendReport();
         return;
       }
     }
-    // Would have returned above in case of success.
-    sendErrReport();
+  } else if (!pressed) {
+    for (uint8_t i = 0; i < 6; i++) {
+      if (reportOut->keys[i] == key) {
+        reportOut->keys[i] = 0x00;
+        sendReport();
+        return;
+      }
+    }
   }
+
+  // Would have returned above in case of success.
+  sendErrReport();
 }
+
+// \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
 
 void replayMacro(uint8_t sector) {
   lightLed(LedColor::blue);
