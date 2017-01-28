@@ -62,22 +62,25 @@ void HIDSelector::ParseHIDData(
   }
 
   for (uint8_t i = 0; i < 6; i++) {
-    uint8_t key = reportIn->keys[i];
-    if (key == 0) break;
-    if (key == 1) {
+    uint8_t key;
+
+    // Check new report for pressed keys.
+    key = reportIn->keys[i];
+    if (key == 0) {
+      // No-op.
+    } else if (key == 1) {
       sendErrReport();
       return;  // Error reports "1".
+    } else if (!reportContains(reportInPrev, key)) {
+      handleUsbKey(PRESSED, key);
     }
-    if (!reportContains(reportInPrev, key)) {
-      handleUsbKey(1, key);
-    }
-  }
 
-  for (uint8_t i = 0; i < 6; i++) {
-    uint8_t key = reportInPrev->keys[i];
-    if (key == 0) break;
-    if (!reportContains(reportIn, key)) {
-      handleUsbKey(0, key);
+    // Check old report for released keys
+    key = reportInPrev->keys[i];
+    if (key == 0) {
+      // No-op.
+    } else if (!reportContains(reportIn, key)) {
+      handleUsbKey(RELEASED, key);
     }
   }
 
