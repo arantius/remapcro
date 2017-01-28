@@ -9,7 +9,7 @@
 #include "UsbHost.h"
 
 
-#define DEBUG
+//#define DEBUG
 
 USB Usb;
 
