@@ -2,12 +2,10 @@
 // from the attached USB keyboard and turning it into events that the
 // rest of the system can digest (calling USB device functions).
 
-byte buf[8] = {0};
-KeyboardReportParser keyboardReportParser;
-KeyReport *reportIn;
-KeyReport *reportInPrev;
+HIDBoot<USB_HID_PROTOCOL_KEYBOARD>    HidKeyboard(&Usb);
+HIDSelector hidSelector(&Usb);
+KbdRptParser Prs;
 
-// \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
 
 void initUsbHost() {
   Serial.println(F("Init USB host ..."));
@@ -16,31 +14,10 @@ void initUsbHost() {
     Serial.println(F("USB host init fail!"));
   }
 
-  reportIn = (KeyReport*) malloc(sizeof(struct KeyReport));
-  memset(reportIn, 0, 8);
-  reportInPrev = (KeyReport*) malloc(sizeof(struct KeyReport));
-  memset(reportInPrev, 0, 8);
-}
-
-
-bool reportContains(KeyReport* report, byte key) {
-  for (uint8_t i = 0; i < 6; i++) {
-    if (report->keys[i] == key) return true;
-    if (report->keys[i] == 0) return false;
-  }
-  return false;
+  HidKeyboard.SetReportParser(0, &Prs);
 }
 
 // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
-
-class HIDSelector : public HIDComposite {
-  public:
-    HIDSelector(USB *p) : HIDComposite(p) {};
-  protected:
-    void ParseHIDData(USBHID *hid, uint8_t ep, bool is_rpt_id, uint8_t len, uint8_t *buf);
-    bool SelectInterface(uint8_t iface, uint8_t proto);
-};
-
 
 bool HIDSelector::SelectInterface(uint8_t iface, uint8_t proto) {
   if (proto != 0) {
@@ -52,41 +29,21 @@ bool HIDSelector::SelectInterface(uint8_t iface, uint8_t proto) {
 
 void HIDSelector::ParseHIDData(
     USBHID *hid, uint8_t ep, bool is_rpt_id, uint8_t len, uint8_t *buf) {
-  // Default report parser handles LED twiddling.
-  keyboardReportParser.Parse(hid, is_rpt_id, len, buf);
+}
 
-  memcpy(reportIn, buf, len);
+// \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ //
 
-  if (reportInPrev->modifiers != reportIn->modifiers) {
-    handleModifiers(reportIn->modifiers);
-  }
-
-  for (uint8_t i = 0; i < 6; i++) {
-    uint8_t key;
-
-    // Check new report for pressed keys.
-    key = reportIn->keys[i];
-    if (key == 0) {
-      // No-op.
-    } else if (key == 1) {
-      sendErrReport();
-      return;  // Error reports "1".
-    } else if (!reportContains(reportInPrev, key)) {
-      handleUsbKey(PRESSED, key);
-    }
-
-    // Check old report for released keys
-    key = reportInPrev->keys[i];
-    if (key == 0) {
-      // No-op.
-    } else if (!reportContains(reportIn, key)) {
-      handleUsbKey(RELEASED, key);
-    }
-  }
-
-  memcpy(reportInPrev, reportIn, 8);
+void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after) {
+  handleModifiers(after);
 }
 
 
-HIDSelector hidSelector(&Usb);
+void KbdRptParser::OnKeyDown(uint8_t mod, uint8_t key) {
+  handleUsbKey(1, key);
+}
+
+
+void KbdRptParser::OnKeyUp(uint8_t mod, uint8_t key) {
+  handleUsbKey(0, key);
+}
 
