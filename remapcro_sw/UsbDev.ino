@@ -261,26 +261,18 @@ void replayMacro(uint8_t sector) {
         modifierMode = 0;
         reportOut->modifiers = key;
       } else {
-        for (uint8_t j = 0; j < 6; j++) {
-          if (reportOut->keys[j] == key) {
-            // Key is in report, remove it.
-            if (j < 5) {
-              memmove(&reportOut->keys[j], &reportOut->keys[j+1], 6 - j);
-            }
-            reportOut->keys[5] = 0x00;
+        for (uint8_t i = 0; i < 6; i++) {
+          if (reportOut->keys[i] == key) {
+            reportOut->keys[i] = 0x00;
             break;
-          } else if (reportOut->keys[j] == 0x00) {
-            // Key is not in report, add it.
-            reportOut->keys[j] = key;
+          } else if (reportOut->keys[i] == 0x00) {
+            reportOut->keys[i] = key;
             break;
           }
         }
       }
 
       sendReport();
-    }
-
-    if (key != 0x00) {
       while (millis() < tmNext) ;;
       tmNext = millis() + 20;
     }
