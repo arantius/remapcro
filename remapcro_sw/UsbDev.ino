@@ -7,7 +7,7 @@
 #define USB_DEV_DBG
 #endif
 
-#define MACRO_READ_BLOCK 16
+#define MACRO_READ_BLOCK 64
 
 
 KeyReport *reportOut;
