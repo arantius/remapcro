@@ -278,7 +278,7 @@ void replayMacro(uint8_t sector) {
 
       sendReport();
       while (millis() < tmNext) ;;
-      tmNext = millis() + 20;
+      tmNext = millis() + 16;
     }
 
     size--;
