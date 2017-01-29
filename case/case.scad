@@ -1,4 +1,4 @@
-include <key_pcb.scad>;
+include <pcbs.scad>;
 include <top.scad>;
 
 $fs = 0.5;
