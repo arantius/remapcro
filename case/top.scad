@@ -1,26 +1,10 @@
-module wall_shape(l, w, h, t, r) {
-  module fb_wall() {
-    union() {
-      translate([r, r, 0]) {
-        cylinder(h=h + 2*r, r=r);
-        translate([0, w - 2*r, 0])
-          cylinder(h=h + 2*r, r=r);
-      }
-    }
-  }
+include <wall_shape.scad>;
 
-  hull() {
-    fb_wall();
-    translate([l - 2*r, 0, 0])
-      rotate([0, 10, 0])
-        fb_wall();
-  }
-}
-
-hole_rad = 1.8;
+hole_rad = 1.8;  // Holes in PCB, ample room for M3.
 depth_to_pcb = 12.6;
 module top(l, w, h, t, r, hole_height) {
-  color("silver") difference() {
+  color("silver")
+  difference() {
     union() {
       // Outer walls.
       difference() {
@@ -39,7 +23,8 @@ module top(l, w, h, t, r, hole_height) {
       translate([l - 3.4, t + w/2 - 2.5, depth_to_pcb - 8]) difference() {
         cube([9, 5, 8]);
         translate([-8, -1, -4.5]) rotate([0, 30, 0]) cube([12, 7, 12]);
-        translate([2.5, 2.5, 0]) cylinder(r=hole_rad, h=10);
+        // Hole sized to directly accept M3 threads, no hardware (no room!).
+        translate([2.5, 2.5, 0]) cylinder(r=hole_rad - 0.2, h=10);
       };
 
       // Rear peg slotting into that hole from the first spacer.
@@ -49,15 +34,17 @@ module top(l, w, h, t, r, hole_height) {
       }
     };
 
-    // Inset for back to fit into.
-    translate([-1, t, t]) cube([1.3+t, w, h - t*2/3 + 5]);
-    // Plus a small cutout for space where PCB pins stick out.
-    translate([3.6, t + w/2 - 0.5, depth_to_pcb - 1.0]) cube([2, 2, 2]);
-    // And room for the bottom plate.
-    translate([0, t, h - t - 0.5]) rotate([0, 5, 0]) cube([20, w, 5]);
-
     // Minus the angled bottom.
     translate([-5, -5, h]) rotate([0, 5, 0]) cube([l+20, w+20, h]);
+
+    // Inset for the bottom plate to fit into.
+    translate([t - 1, t - 1, h - t]) rotate([0, 5, 0])
+      translate([-5, 0, 0]) wall_shape(l + 11, w + 2, 10, t, r);
+
+    // Inset for back to fit into.
+    translate([-1, t - 1, t]) cube([1.3+t, w + 2, h - t*2/3 + 5]);
+    // Plus a small cutout for space where PCB pins stick out.
+    translate([3.6, t + w/2 - 0.5, depth_to_pcb - 1.0]) cube([2, 2, 2]);
 
     // Hole for mounting screw.
     rotate([0, 90, 0]) translate([-hole_height, t + w/2, -1]) {
@@ -67,9 +54,13 @@ module top(l, w, h, t, r, hole_height) {
 
     // Work around for first logic PCB misalignment, cut out space where
     // it unintentionally sticks out.
-    translate([t, t, depth_to_pcb + 2]) {
-      rotate([0, 0, -2.5]) cube([35, 4, 10]);
-      translate([34.9, -1.525, 0]) rotate([0, 0, 2.5]) cube([15, 4, 5]);
-    }
+    difference() {
+      translate([t + 2, t, depth_to_pcb + 2]) {
+        rotate([0, 0, -2.5]) cube([33, 4, 20]);
+        translate([32.9, -1.43, 0]) rotate([0, 0, 2.5]) cube([15, 4, 20]);
+      };
+
+      translate([0,0, h - 2.3]) rotate([0, 5, 0]) cube([60, 10, 10]);
+    };
   }
 }
