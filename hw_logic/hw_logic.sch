@@ -302,29 +302,16 @@ Wire Wire Line
 Wire Wire Line
 	1100 2350 1000 2350
 Wire Wire Line
-	1550 4550 1550 4650
-Wire Wire Line
-	1550 4150 1550 4050
-$Comp
-L +3.3V #PWR010
-U 1 1 5853729D
-P 1550 4050
-F 0 "#PWR010" H 1550 3900 50  0001 C CNN
-F 1 "+3.3V" H 1550 4190 50  0000 C CNN
-F 2 "" H 1550 4050 50  0000 C CNN
-F 3 "" H 1550 4050 50  0000 C CNN
-	1    1550 4050
-	1    0    0    -1  
-$EndComp
+	1100 4150 1100 4250
 $Comp
 L GND #PWR011
 U 1 1 585373B0
-P 1550 4650
-F 0 "#PWR011" H 1550 4400 50  0001 C CNN
-F 1 "GND" H 1550 4500 50  0000 C CNN
-F 2 "" H 1550 4650 50  0000 C CNN
-F 3 "" H 1550 4650 50  0000 C CNN
-	1    1550 4650
+P 1100 4250
+F 0 "#PWR011" H 1100 4000 50  0001 C CNN
+F 1 "GND" H 1100 4100 50  0000 C CNN
+F 2 "" H 1100 4250 50  0000 C CNN
+F 3 "" H 1100 4250 50  0000 C CNN
+	1    1100 4250
 	1    0    0    -1  
 $EndComp
 Text Label 3200 4200 2    60   ~ 0
@@ -343,8 +330,6 @@ Text Label 3200 4800 2    60   ~ 0
 GI2
 NoConn ~ 4600 2450
 Wire Wire Line
-	1550 4150 1650 4150
-Wire Wire Line
 	3200 4200 3300 4200
 Wire Wire Line
 	3200 4300 3300 4300
@@ -359,7 +344,7 @@ Wire Wire Line
 Wire Wire Line
 	3200 4800 3300 4800
 Wire Wire Line
-	1550 4550 1650 4550
+	1100 4150 1650 4150
 NoConn ~ 2500 2050
 NoConn ~ 2500 2150
 NoConn ~ 1100 2450
@@ -581,4 +566,7 @@ F 3 "" H 3500 4500 50  0000 C CNN
 	1    3500 4500
 	1    0    0    1   
 $EndComp
+NoConn ~ 1650 4550
+Text Notes 650  4950 0    60   ~ 0
+Awkward layout of this connector is\nfor compatibility with already laid-out\nmating "key" board.
 $EndSCHEMATC
