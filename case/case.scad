@@ -21,3 +21,4 @@ hole_height = 6;
 
 top(cl, cw, ch, ct, cr, hole_height);
 key_pcb();
+logic_pcb();
