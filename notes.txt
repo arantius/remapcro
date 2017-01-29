@@ -8,3 +8,38 @@ Errors/issues in first boards:
 * The RGB LED is indeed common cathode, so hooking it to +3v3 won't work.
 * The RGB LED should be rotated 180 so the dimple fits into the matching slot
   of the key switch.
+
+
+Extended keys:
+Ducky DK9008P, press then release in order:
+Mute, Vol Dn, Vol Up,
+Calc, Computer, Email, Home
+
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 00 00 00 00
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 00 01 00 00
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 00 00 00 00
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 00 02 00 00
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 00 00 00 00
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 00 04 00 00
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 00 00 00 00
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 10 00 00 00
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 00 00 00 00
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 20 00 00 00
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 00 00 00 00
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 40 00 00 00
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 00 00 00 00
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 80 00 00 00
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 00 00 00 00
+
+Press all seven of those, in order:
+
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 00 00 00 00
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 00 01 00 00
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 00 03 00 00
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 00 07 00 00
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 10 07 00 00
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 30 07 00 00
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 70 07 00 00
+ep=2; is_rpt_id=0; len=5; pr=0; dat=0.  02 F0 07 00 00
+
+As expected.  Uesless without its HID report data?
