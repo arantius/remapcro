@@ -39,7 +39,7 @@ module top(l, w, h, t, r, hole_height) {
 
     // Inset for the bottom plate to fit into.
     translate([t - 1, t - 1, h - t]) rotate([0, 5, 0])
-      translate([-5, 0, 0]) wall_shape(l + 11, w + 2, 10, t, r);
+      translate([-5, 0, 0]) wall_shape(l + 11.2, w + 2, 10, t, r);
 
     // Inset for back to fit into.
     translate([-1, t - 1, t]) cube([1.3+t, w + 2, h - t*2/3 + 5]);

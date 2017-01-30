@@ -8,7 +8,7 @@ module bottom(l, w, h, t, r, hole_height) {
     union() {
       // Bottom plate.
       translate([t - 1 + .01, t - 1 + 0.1, h - t]) rotate([0, 5, 0])
-        translate([-5, 0, 0]) wall_shape(l + 11 - 0.2, w + 2 - 0.2, 10, t, r);
+        translate([-5, 0, 0]) wall_shape(l + 11 - 0.1, w + 2 - 0.2, 10, t, r);
 
       // Back plate.
       translate([-1, t - 1, t]) cube([1.0+t, w + 2, h - t*2/3 + 5]);
