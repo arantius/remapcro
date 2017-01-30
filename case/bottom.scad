@@ -40,7 +40,7 @@ module bottom(l, w, h, t, r, hole_height) {
 
     // Holes for front screw guide, threads and head.
     translate([l - 0.9, t + w/2, -1]) cylinder(r=hole_rad + 0.2, h=25);
-    translate([l - 0.9, t + w/2, 16.5]) cylinder(r=3, h=5);
+    translate([l - 0.9, t + w/2, h-15.5]) cylinder(r=3, h=5);
 
     // Hole for mounting screw.
     rotate([0, 90, 0]) translate([-hole_height, t + w/2, -1]) {
