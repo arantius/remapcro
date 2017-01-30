@@ -1,5 +1,6 @@
 include <pcbs.scad>;
 include <top.scad>;
+include <bottom.scad>;
 
 $fs = 0.5;
 
@@ -12,13 +13,17 @@ cw = 39.0;
 // if I want to try to hide their edges.
 
 // Tallest height, outer wall thickness, corner rounding radius of the case.
-ch = 31.9;
+ch = 34.25;
 ct = 2.5;
 cr = 2;
 
 // Height from origin for mounting hole in the back.
 hole_height = 6;
 
+
+%key_pcb();
+%logic_pcb();
+
+
 top(cl, cw, ch, ct, cr, hole_height);
-key_pcb();
-logic_pcb();
+bottom(cl, cw, ch, ct, cr, hole_height);

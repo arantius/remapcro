@@ -3,7 +3,7 @@ include <wall_shape.scad>;
 hole_rad = 1.8;  // Holes in PCB, ample room for M3.
 depth_to_pcb = 12.6;
 module top(l, w, h, t, r, hole_height) {
-  color("silver")
+  //color("silver")
   difference() {
     union() {
       // Outer walls.
