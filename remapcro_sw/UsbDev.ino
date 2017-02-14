@@ -258,7 +258,7 @@ void replayMacro(uint8_t sector) {
 #ifdef USB_DEV_DBG
     Serial.print(key, HEX); Serial.print(" ");
 #endif
-    if (key == 0x00) {
+    if (!modifierMode && key == 0x00) {
       modifierMode = 1;
     } else {
       if (modifierMode) {
