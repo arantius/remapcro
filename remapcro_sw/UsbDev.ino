@@ -265,13 +265,24 @@ void replayMacro(uint8_t sector) {
         modifierMode = 0;
         reportOut->modifiers = key;
       } else {
+        uint8_t toggled = 0;
+
+        // Look for an already-pressed copy of this key to release.
         for (uint8_t i = 0; i < 6; i++) {
           if (reportOut->keys[i] == key) {
             reportOut->keys[i] = 0x00;
+            toggled = 1;
             break;
-          } else if (reportOut->keys[i] == 0x00) {
-            reportOut->keys[i] = key;
-            break;
+          }
+        }
+
+        // If no toggle (release) above, look for a slot to press with.
+        if (!toggled) {
+          for (uint8_t i = 0; i < 6; i++) {
+            if (reportOut->keys[i] == 0x00) {
+              reportOut->keys[i] = key;
+              break;
+            }
           }
         }
       }
